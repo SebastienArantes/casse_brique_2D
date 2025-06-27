@@ -22,6 +22,7 @@ let brickOffsetTop = 30;
 let brickOffsetLeft = 30;
 const gameOverNotif = document.querySelector(".game-over_notify");
 let interval;
+let score = 0;
 
 let bricks = [];
 for (let c = 0; c < brickColumnCount; c++) {
@@ -73,11 +74,24 @@ function collisionDetection() {
                 if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
                     dy = -dy;
                     b.status = 0;
+                    score++;
                     currentColor = getRandomColor();
+                    if (score === brickRowCount * brickColumnCount) {
+                        alert(`SCORE FINAL = ${score}. VICTOIRE, BRAVO !!!`);
+                        document.location.reload();
+                        clearInterval(interval);
+
+                    }
                 }
             }
         }
     }
+}
+
+function drawScore() {
+    ctx.font = "1rem Arial";
+    ctx.fillStyle = "#000";
+    ctx.fillText("Score: " + score, 8, 20);
 }
 
 function drawBall() {
@@ -122,6 +136,7 @@ function draw() {
     drawBricks();
     drawBall();
     drawRaquette();
+    drawScore();
     collisionDetection();
     //gestion du rebond
     // si la balle touche le bord gauche ou droit
