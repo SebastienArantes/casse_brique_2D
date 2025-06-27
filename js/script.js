@@ -35,9 +35,14 @@ for (let c = 0; c < brickColumnCount; c++) {
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
+document.addEventListener("mousemove", mouseMoveHandler, false);
 gameOverNotif.addEventListener("click", () => {
     document.location.reload();
 });
+
+function mouseMoveHandler(event) {
+    //gestion de la raquette avec la souris ici
+}
 
 function keyDownHandler(event) {
     if (event.key === "Right" || event.key === "ArrowRight") {
