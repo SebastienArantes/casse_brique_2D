@@ -4,6 +4,8 @@
     box-sizing: border-box;
 }
 #myCanvas {
+    /* width : 480px;
+    height : 320px; */
     background: #eee;
     display: block;
     margin: 0 auto;
