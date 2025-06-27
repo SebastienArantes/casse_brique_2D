@@ -13,9 +13,30 @@ let raquetteWidth = 75;
 let raquetteX = (canvas.width - raquetteWidth) / 2;
 let rightPressed = false;
 let leftPressed = false;
+let brickRowCount = 3;
+let brickColumnCount = 5;
+let brickWidth = 75;
+let brickHeight = 20;
+let brickPadding = 10;
+let brickOffsetTop = 30;
+let brickOffsetLeft = 30;
+const gameOverNotif = document.querySelector(".game-over_notify");
+let interval;
+
+let bricks = [];
+for (let c = 0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (let r = 0; r < brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0, status: 1};
+    }
+}
+
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
+gameOverNotif.addEventListener("click", () => {
+    document.location.reload();
+});
 
 function keyDownHandler(event) {
     if (event.key === "Right" || event.key === "ArrowRight") {
@@ -44,10 +65,26 @@ function getRandomColor() {
     return newColor;
 }
 
+function collisionDetection() {
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+            let b = bricks[c][r];
+            if (b.status === 1) {
+                if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                    dy = -dy;
+                    b.status = 0;
+                    currentColor = getRandomColor();
+                }
+            }
+        }
+    }
+}
+
 function drawBall() {
     ctx.beginPath();
     ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
     ctx.fillStyle = currentColor;
+    // ctx.fillStyle = "#2cff02";
     ctx.fill();
     ctx.closePath();
 }
@@ -60,29 +97,53 @@ function drawRaquette() {
     ctx.closePath();
 }
 
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBall();
-    drawRaquette();
-    //gestion du rebond
-    // si la balle touche le bord supérieur ou inférieur
-    if (y + dy < ballRadius) {
-        dy = -dy;
-        currentColor = getRandomColor();
-    } else if (y + dy > canvas.height - ballRadius) {
-        if (x > raquetteX && x < raquetteX + raquetteWidth) {
-            dy = -dy;
-            currentColor = getRandomColor();
-        } else {
-            alert("GAME OVER !!! AHAHAAH !");
-            document.location.reload();
-            clearInterval(interval);
+function drawBricks() {
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+            if (bricks[c][r].status === 1) {
+                // let brickX = (r*(brickWidth+brickPadding))+brickOffsetLeft;
+                // let brickY = (c*(brickHeight+brickPadding))+brickOffsetTop;
+                let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+                bricks[c][r].x = brickX;
+                bricks[c][r].y = brickY;
+                ctx.beginPath();
+                ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                ctx.fillStyle = "#7e7e7e";
+                ctx.fill();
+                ctx.closePath();
+            }
         }
     }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBricks();
+    drawBall();
+    drawRaquette();
+    collisionDetection();
+    //gestion du rebond
     // si la balle touche le bord gauche ou droit
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
         dx = -dx;
-        currentColor = getRandomColor();
+        // currentColor = getRandomColor();
+    }
+    // si la balle touche le bord supérieur ou inférieur
+    if (y + dy < ballRadius) {
+        dy = -dy;
+        // currentColor = getRandomColor();
+    } else if (y + dy > canvas.height - ballRadius) {
+        if (x > raquetteX && x < raquetteX + raquetteWidth) {
+            if (y = y - raquetteHeight) {
+                dy = -dy;
+                // currentColor = getRandomColor();
+            }
+        } else {
+            gameOverNotif.style.display = "flex";
+            clearInterval(interval);
+            return;
+        }
     }
 
     if (rightPressed && raquetteX < canvas.width - raquetteWidth) {
@@ -94,4 +155,5 @@ function draw() {
     y += dy;
 }
 
-let interval = setInterval(draw, 10);
+interval = setInterval(draw, 10);
+// setInterval(draw, 10);
