@@ -66,9 +66,18 @@ function draw() {
     drawRaquette();
     //gestion du rebond
     // si la balle touche le bord supérieur ou inférieur
-    if (y + dy > canvas.height - ballRadius|| y + dy < ballRadius) {
+    if (y + dy < ballRadius) {
         dy = -dy;
         currentColor = getRandomColor();
+    } else if (y + dy > canvas.height - ballRadius) {
+        if (x > raquetteX && x < raquetteX + raquetteWidth) {
+            dy = -dy;
+            currentColor = getRandomColor();
+        } else {
+            alert("GAME OVER !!! AHAHAAH !");
+            document.location.reload();
+            clearInterval(interval);
+        }
     }
     // si la balle touche le bord gauche ou droit
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
@@ -85,4 +94,4 @@ function draw() {
     y += dy;
 }
 
-setInterval(draw, 10);
+let interval = setInterval(draw, 10);
